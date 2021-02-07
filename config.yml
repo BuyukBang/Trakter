@@ -1,0 +1,99 @@
+variables: variables.yml
+tasks:
+
+# Parses imdb id's from imdb.txt and fill Movies list. No Releases list is initialized with all movies to remove some items later.
+  search_imdb:
+    disable: builtins
+    csv:
+      url: file:///{? TempFilePath ?}
+      values:
+        imdb_id: 1
+        url: 0
+        title: 0
+    accept_all: yes
+    list_add:
+      - movie_list: '$ListName''All'
+      - movie_list: '$ListName''NoReleases'
+
+# Removes imdb id's existing in the Releases list torrent from search list.
+  prepare_torrent_search:
+    disable: builtins
+    trakt_list:
+      account: '{? Account ?}'
+      list: '$ListName Releases'
+      type: movies
+    accept_all: yes
+    list_remove:
+      - movie_list: 'NoReleases'
+      - movie_list: '$ListName''All'
+
+# Searches imdb id's in RarBG. Then adds found movies to Relased lists.
+  search_torrents:
+    disable: builtins
+    #Uncomment to use a proxy server if torrent websites are being blocked in your country
+    #proxy: '{? Proxy ?}'
+    discover:
+      interval: 1 minutes
+      limit: 1
+      release_estimations: ignore
+      what:
+         - movie_list: '$ListName''All'
+      from:
+        - rarbg:
+            category: [42, 46, 44, 47, 50, 51, 52]
+        - piratebay:
+            category: highres movies
+            #Uncomment to use another domain of tpb
+            #url: https://thepiratebay.org
+    accept_all: yes
+    list_add:
+      - movie_list: '$ListName''Releases'
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$ListName Releases'
+          type: movies
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$Releases'
+          type: movies
+
+# Removes all movies already found as released before from the No Releases list. This is just for double check.
+  fill_no_releases:
+    disable: builtins
+    movie_list: '$ListName''Releases'
+    accept_all: yes
+    list_remove:
+      - movie_list: '$ListName''NoReleases'
+
+# Adds unreleased movies to No Releases lists.
+  add_no_releases:
+    disable: builtins
+    movie_list: '$ListName''NoReleases'
+    accept_all: yes
+    list_add:
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$ListName No Releases'
+          type: movies
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$NoReleases'
+          type: movies
+
+# Removes any movies from No Releases lists if they've already been added Releases List.
+  clean_no_releases:
+    disable: builtins
+    trakt_list:
+      account: '{? Account ?}'
+      list: 'Releases'
+      type: movies
+    accept_all: yes
+    list_remove:
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$NoReleases'
+          type: movies
+      - trakt_list:
+          account: '{? Account ?}'
+          list: '$ListName No Releases'
+          type: movies
