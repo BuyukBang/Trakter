@@ -12,22 +12,23 @@ tasks:
         title: 0
     accept_all: yes
     list_add:
-      - movie_list: '$ListName''All'
-      - movie_list: '$ListName''NoReleases'
+      - movie_list: All
+      - movie_list: Releases
+      - movie_list: NoReleases
 
 # Removes imdb id's existing in the Releases list torrent from search list.
   prepare_torrent_search:
     disable: builtins
     trakt_list:
       account: '{? Account ?}'
-      list: '$ListName Releases'
+      list: 'Releases'
       type: movies
     accept_all: yes
     list_remove:
-      - movie_list: 'NoReleases'
-      - movie_list: '$ListName''All'
+      - movie_list: All
+      - movie_list: NoReleases
 
-# Searches imdb id's in RarBG. Then adds found movies to Relased lists.
+# Searches imdb id's in RarBG. Then adds found movies to Relased lists. Using more than one torrent search engine may create duplicate values.
   search_torrents:
     disable: builtins
     #Uncomment to use a proxy server if torrent websites are being blocked in your country
@@ -37,7 +38,7 @@ tasks:
       limit: 1
       release_estimations: ignore
       what:
-         - movie_list: '$ListName''All'
+         - movie_list: All
       from:
         - rarbg:
             category: [42, 46, 44, 47, 50, 51, 52]
@@ -47,7 +48,30 @@ tasks:
             #url: https://thepiratebay.org
     accept_all: yes
     list_add:
-      - movie_list: '$ListName''Releases'
+      - movie_list: ReleasesWithPossibleDuplicates
+
+# Removes all movies already found as released before from the No Releases list. This is just for double check.
+  finalize_no_releases:
+    disable: builtins
+    movie_list: ReleasesWithPossibleDuplicates
+    accept_all: yes
+    list_remove:
+      - movie_list: NoReleases
+
+# Remove possible duplicate values from releases list and create a clean list.
+  clean_duplicate_releases:
+    disable: builtins
+    movie_list: NoReleases
+    accept_all: yes
+    list_remove:
+      - movie_list: Releases
+
+# Add to Trakt Releases lists
+  add_trakt_releases:
+    disable: builtins
+    movie_list: Releases
+    accept_all: yes
+    list_add:
       - trakt_list:
           account: '{? Account ?}'
           list: '$ListName Releases'
@@ -57,18 +81,10 @@ tasks:
           list: '$Releases'
           type: movies
 
-# Removes all movies already found as released before from the No Releases list. This is just for double check.
-  fill_no_releases:
+# Add to Trakt No Releases lists
+  add_trakt_no_releases:
     disable: builtins
-    movie_list: '$ListName''Releases'
-    accept_all: yes
-    list_remove:
-      - movie_list: '$ListName''NoReleases'
-
-# Adds unreleased movies to No Releases lists.
-  add_no_releases:
-    disable: builtins
-    movie_list: '$ListName''NoReleases'
+    movie_list: NoReleases
     accept_all: yes
     list_add:
       - trakt_list:
