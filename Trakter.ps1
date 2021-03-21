@@ -3,11 +3,11 @@ Remove-Item imdb.txt -ErrorAction Ignore
 
 
 function DoJobs {
-	$SixMonthsAgo=(Get-Date).AddMonths(-6).ToString('yyyy-MM-dd')
-	$UrlParams='release_date=' + $SixMonthsAgo + ',&user_rating=6.0,&num_votes=10000,'
+  $SixMonthsAgo=(Get-Date).AddMonths(-6).ToString('yyyy-MM-dd')
+  $UrlParams='release_date=' + $SixMonthsAgo + ',&user_rating=6.0,&num_votes=10000,'
   UpdateList '"Releases=Releases" "NoReleases=No Releases"' $UrlParams
   UpdateList '"Releases=Releases" "NoReleases=No Releases"' 'release_date=2015,&user_rating=6.0,&num_votes=25000,'
-	UpdateList '"Releases=Releases With Low Rating" "NoReleases=No Releases With Low Rating"' 'release_date=2015,&user_rating=5.0,5.9&num_votes=25000,'
+  UpdateList '"Releases=Releases With Low Rating" "NoReleases=No Releases With Low Rating"' 'release_date=2015,&user_rating=5.0,5.9&num_votes=25000,'
   UpdateList '"Releases=Horror Releases" "NoReleases=Horror No Releases"' 'release_date=2015,&user_rating=5.3,&num_votes=10000,&genres=horror,'
   UpdateList '"Releases=Turkish Releases" "NoReleases=Turkish No Releases"' 'release_date=2015,&user_rating=5.3,&num_votes=3000,&countries=tr,'
 }
