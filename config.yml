@@ -20,8 +20,8 @@ tasks:
   prepare_torrent_search:
     disable: builtins
     trakt_list:
-      account: '{? Account ?}'
-      list: 'Releases'
+      account: '{? TraktAccount ?}'
+      list: '$Releases'
       type: movies
     accept_all: yes
     list_remove:
@@ -73,13 +73,14 @@ tasks:
     accept_all: yes
     list_add:
       - trakt_list:
-          account: '{? Account ?}'
-          list: '$ListName Releases'
-          type: movies
-      - trakt_list:
-          account: '{? Account ?}'
+          account: '{? TraktAccount ?}'
           list: '$Releases'
           type: movies
+      # imdb_list plugin isn't working correctly right now: https://flexget.com/Plugins/List/imdb_list
+      #- imdb_list:
+      #    login: '{? IMDBAccount ?}'
+      #    password: '$Releases'
+      #    list: '$Releases'
 
 # Add to Trakt No Releases lists
   add_trakt_no_releases:
@@ -88,28 +89,31 @@ tasks:
     accept_all: yes
     list_add:
       - trakt_list:
-          account: '{? Account ?}'
-          list: '$ListName No Releases'
-          type: movies
-      - trakt_list:
-          account: '{? Account ?}'
+          account: '{? TraktAccount ?}'
           list: '$NoReleases'
           type: movies
+      # imdb_list plugin isn't working correctly right now: https://flexget.com/Plugins/List/imdb_list
+      #- imdb_list:
+      #    login: '{? IMDBAccount ?}'
+      #    password: '$Releases'
+      #    list: '$NoReleases'
 
 # Removes any movies from No Releases lists if they've already been added Releases List.
   clean_no_releases:
     disable: builtins
     trakt_list:
-      account: '{? Account ?}'
-      list: 'Releases'
+      account: '{? TraktAccount ?}'
+      list: '$Releases'
       type: movies
     accept_all: yes
     list_remove:
       - trakt_list:
-          account: '{? Account ?}'
+          account: '{? TraktAccount ?}'
           list: '$NoReleases'
           type: movies
-      - trakt_list:
-          account: '{? Account ?}'
-          list: '$ListName No Releases'
-          type: movies
+      # imdb_list plugin isn't working correctly right now: https://flexget.com/Plugins/List/imdb_list
+      #- imdb_list:
+      #    login: '{? IMDBAccount ?}'
+      #    password: '{? IMDBPassword ?}'
+      #    list: '$NoReleases'
+

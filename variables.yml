@@ -1,3 +1,6 @@
-﻿Account: YourTraktAccount@gmail.com
+﻿TraktAccount: YourTraktAccount@gmail.com
+IMDBAccount: YourIMDBAccount@gmail.com
+IMDBPassword: YourIMDBPass
 Proxy: https://YourProxyAccount:YourProxyPass@YourProxyDomain:YourProxyPath
 TempFilePath: C:\YourTrakterPath\imdb.txt
+
