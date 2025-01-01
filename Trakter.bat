@@ -1,2 +1,2 @@
-powershell -noexit -executionpolicy bypass -File Trakter.ps1
+powershell -executionpolicy bypass -File Trakter.ps1
 
