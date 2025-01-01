@@ -1,7 +1,7 @@
 variables: variables.yml
 tasks:
 
-# Parses imdb id's from imdb.txt and fill Movies list. No Releases list is initialized with all movies to remove some items later.
+# Parses imdb id's from imdb.txt and fill Movies list.
   search_imdb:
     disable: builtins
     csv:
@@ -12,12 +12,11 @@ tasks:
         title: 0
     accept_all: yes
     list_add:
-      - movie_list: All
+      - movie_list: New
       - movie_list: Releases
-      - movie_list: NoReleases
 
-# Removes imdb id's existing in the Releases list torrent from search list.
-  prepare_torrent_search:
+# Removes imdb id's existing in the Releases list from new list.
+  find_new_movies:
     disable: builtins
     trakt_list:
       account: '{? TraktAccount ?}'
@@ -25,51 +24,12 @@ tasks:
       type: movies
     accept_all: yes
     list_remove:
-      - movie_list: All
-      - movie_list: NoReleases
-
-# Searches imdb id's in RarBG. Then adds found movies to Relased lists. Using more than one torrent search engine may create duplicate values.
-  search_torrents:
-    disable: builtins
-    #Uncomment to use a proxy server if torrent websites are being blocked in your country
-    #proxy: '{? Proxy ?}'
-    discover:
-      interval: 1 minutes
-      limit: 1
-      release_estimations: ignore
-      what:
-         - movie_list: All
-      from:
-        - rarbg:
-            category: [42, 46, 44, 47, 50, 51, 52]
-        - piratebay:
-            category: highres movies
-            #Uncomment to use another domain of tpb
-            #url: https://thepiratebay.org
-    accept_all: yes
-    list_add:
-      - movie_list: ReleasesWithPossibleDuplicates
-
-# Removes all movies already found as released before from the No Releases list. This is just for double check.
-  finalize_no_releases:
-    disable: builtins
-    movie_list: ReleasesWithPossibleDuplicates
-    accept_all: yes
-    list_remove:
-      - movie_list: NoReleases
-
-# Remove possible duplicate values from releases list and create a clean list.
-  clean_duplicate_releases:
-    disable: builtins
-    movie_list: NoReleases
-    accept_all: yes
-    list_remove:
-      - movie_list: Releases
+      - movie_list: New
 
 # Add to Trakt Releases lists
   add_trakt_releases:
     disable: builtins
-    movie_list: Releases
+    movie_list: New
     accept_all: yes
     list_add:
       - trakt_list:
@@ -81,39 +41,3 @@ tasks:
       #    login: '{? IMDBAccount ?}'
       #    password: '$Releases'
       #    list: '$Releases'
-
-# Add to Trakt No Releases lists
-  add_trakt_no_releases:
-    disable: builtins
-    movie_list: NoReleases
-    accept_all: yes
-    list_add:
-      - trakt_list:
-          account: '{? TraktAccount ?}'
-          list: '$NoReleases'
-          type: movies
-      # imdb_list plugin isn't working correctly right now: https://flexget.com/Plugins/List/imdb_list
-      #- imdb_list:
-      #    login: '{? IMDBAccount ?}'
-      #    password: '$Releases'
-      #    list: '$NoReleases'
-
-# Removes any movies from No Releases lists if they've already been added Releases List.
-  clean_no_releases:
-    disable: builtins
-    trakt_list:
-      account: '{? TraktAccount ?}'
-      list: '$Releases'
-      type: movies
-    accept_all: yes
-    list_remove:
-      - trakt_list:
-          account: '{? TraktAccount ?}'
-          list: '$NoReleases'
-          type: movies
-      # imdb_list plugin isn't working correctly right now: https://flexget.com/Plugins/List/imdb_list
-      #- imdb_list:
-      #    login: '{? IMDBAccount ?}'
-      #    password: '{? IMDBPassword ?}'
-      #    list: '$NoReleases'
-
