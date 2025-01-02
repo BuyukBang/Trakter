@@ -3,10 +3,10 @@ Remove-Item imdb.txt -ErrorAction Ignore
 
 function DoJobs {
   $SixMonthsAgo=(Get-Date).AddMonths(-6).ToString('yyyy-MM-dd')
-  $UrlParams='release_date=' + $SixMonthsAgo + ',&user_rating=6.0,&num_votes=10000,&country_of_origin=!in,&primary_language=!hi'
+  $UrlParams='release_date=' + $SixMonthsAgo + ',&user_rating=6.0,&num_votes=10000'
   UpdateList '"Releases=Releases"' add 0 0 $UrlParams
   UpdateList '"Releases=Releases"' add 2023 0 '&user_rating=5.0,&num_votes=25000'
-  $UrlParams='release_date=2,&user_rating=6.0,&num_votes=10000,80000,&country_of_origin=!in,&primary_language=!hi'
+  $UrlParams='release_date=2,&user_rating=6.0,&num_votes=10000,80000'
   UpdateList '"Releases=Releases"' remove 0 0 $UrlParams
   UpdateList '"Releases=Releases 2020-2022"' add 2020 2022 '&user_rating=5.0,&num_votes=25000'
   UpdateList '"Releases=Releases 2016-2019"' add 2016 2019 '&user_rating=5.0,&num_votes=25000'
@@ -44,9 +44,9 @@ function UpdateList() {
     echo "Getting movie list from IMDB at $StartValue for --> $FlexgetParams"
     $Url=""
     if ($StartYear -eq "0") {
-    	$Url='https://www.imdb.com/search/title/?title_type=feature,tv_movie,tv_special,short,video&count=250&' + $UrlParams
+    	$Url='https://www.imdb.com/search/title/?title_type=feature,tv_movie,tv_special,short,video&country_of_origin=!in&primary_language=!hi&count=250&' + $UrlParams
     } else {
-    	$Url='https://www.imdb.com/search/title/?title_type=feature,tv_movie,tv_special,short,video&count=250&release_date=' + $StartYear + ',' + $StartYear + $UrlParams
+    	$Url='https://www.imdb.com/search/title/?title_type=feature,tv_movie,tv_special,short,video&country_of_origin=!in&primary_language=!hi&count=250&release_date=' + $StartYear + ',' + $StartYear + $UrlParams
     }
     echo $Url
     $r=Invoke-WebRequest -Uri $Url
